@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Link para o conjunto de dados no Kaggle
-dataset_link = "https://www.kaggle.com/datasets/everydaycodings/student-performance-dataset/"
+dataset_link = "https://www.kaggle.com/datasets/dillonmyrick/high-school-student-performance-and-demographics"
 
 df_student_performance = pd.read_csv('student_math_clean.csv')
 
