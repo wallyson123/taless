@@ -15,43 +15,51 @@ st.title("Student Performance Analysis")
 st.subheader("Preview of the Data:")
 st.write(df_student_math.head())
 
-# Filter by Age
-selected_age = st.slider("Select Age:", min_value=int(df_student_math['age'].min()), max_value=int(df_student_math['age'].max()))
-filtered_data_by_age = df_student_math[df_student_math['age'] == selected_age]
+# Filters
+selected_school = st.selectbox("Select School:", df_student_math['school'].unique())
+selected_family_size = st.selectbox("Select Family Size:", df_student_math['family_size'].unique())
+selected_address_type = st.selectbox("Select Address Type:", df_student_math['address_type'].unique())
+
+# Apply filters
+filtered_data = df_student_math[
+    (df_student_math['school'] == selected_school) &
+    (df_student_math['family_size'] == selected_family_size) &
+    (df_student_math['address_type'] == selected_address_type)
+]
 
 # Display filtered data
-st.subheader(f"Data for Students with Age {selected_age}:")
-st.write(filtered_data_by_age)
+st.subheader("Filtered Data:")
+st.write(filtered_data)
 
 # Average ages by school
-average_age_by_school = df_student_math.groupby('school')['age'].mean()
+average_age_by_school = filtered_data.groupby('school')['age'].mean()
 st.subheader("Average Ages by School:")
 st.bar_chart(average_age_by_school)
 
 # Average final grades by different groups
-groups_to_analyze = ['parent_status', 'address_type', 'family_size', 'study_time']
+groups_to_analyze = ['parent_status', 'study_time']
 
 for group in groups_to_analyze:
-    average_final_grade_by_group = filtered_data_by_age.groupby(group)['final_grade'].mean()
-    st.subheader(f"Average Final Grade by {group} for Age {selected_age}:")
+    average_final_grade_by_group = filtered_data.groupby(group)['final_grade'].mean()
+    st.subheader(f"Average Final Grade by {group}:")
     st.bar_chart(average_final_grade_by_group)
 
 # Scatter plot
-st.subheader("Scatter Plot: Health vs. Social with Bubble Size as Final Grade for Age {selected_age}")
+st.subheader("Scatter Plot: Health vs. Social with Bubble Size as Final Grade")
 scatter_plot_fig = px.scatter(
-    filtered_data_by_age,
+    filtered_data,
     x='health',
     y='social',
     size='final_grade',
     color='free_time',
-    title=f'Health vs. Social with Bubble Size as Final Grade for Age {selected_age}'
+    title='Health vs. Social with Bubble Size as Final Grade'
 )
 st.plotly_chart(scatter_plot_fig)
 
 # Summary statistics
-st.subheader(f"Summary Statistics for Age {selected_age}:")
-selected_columns = st.multiselect("Select Columns for Summary Statistics:", filtered_data_by_age.columns)
+st.subheader("Summary Statistics:")
+selected_columns = st.multiselect("Select Columns for Summary Statistics:", filtered_data.columns)
 if selected_columns:
-    st.write(filtered_data_by_age[selected_columns].describe())
+    st.write(filtered_data[selected_columns].describe())
 else:
     st.warning("Please select at least one column for summary statistics.")
